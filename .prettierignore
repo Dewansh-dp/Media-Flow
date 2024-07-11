@@ -1,3 +1,5 @@
+//These files are ignored by prettier during formatting
+
 /.vscode
 /node_modules
 ./dist
@@ -5,4 +7,3 @@
 *.env
 .env
 .env.*
-
