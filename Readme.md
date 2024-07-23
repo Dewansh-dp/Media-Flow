@@ -9,7 +9,11 @@
 3. ### dotenv
     used to config the private variables
 
-4. ### 
+4. ### cors
+    is a middleware used to configure the incoming request 
+
+5. ### cookie-parser
+
 ---
 
 - '.env' have a problem with 'type:module' so the solution for it is to add '-r dotenv/config' in 'dev' command in scripts in the package.json file
@@ -22,4 +26,4 @@
 
 - app.on('eventName',callbackfn) is used to handle custom events and events are emitted by app.emit('eventName')
 
-- app.use() is used to add middlewares and configuration settings
+- app.use() is used to add middlewares and configure settings
