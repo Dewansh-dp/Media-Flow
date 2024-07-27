@@ -27,16 +27,16 @@ app.use(cookieParser());
 app.on("errr", () => {
    console.log("app is not listening ");
 });
-app.get("/", (req, res) => {
-   res.send("home page");
-});
 app.on("ready", () => {
    console.log("app is ready to listen ");
+});
+app.get("/", (req, res) => {
+   res.send("home page");
 });
 
 //trigger the custom events
 app.emit("ready"); // it's a predefined event
-app.emit("errr");
+// app.emit("errr");
 
 //starts the server
 app.listen(process.env.PORT, () => {

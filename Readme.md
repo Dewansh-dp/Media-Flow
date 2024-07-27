@@ -3,16 +3,31 @@
 1. ### express
     to handle request and response
 
-2. ### nodemon
+2. ### mongoose 
+    used to connect to mongodb database
+
+3. ### nodemon
     used to restart server just after making changes  
 
-3. ### dotenv
+4. ### dotenv
     used to config the private variables
 
-4. ### cors
+5. ### cors
     is a middleware used to configure the incoming request 
 
-5. ### cookie-parser
+6. ### cookie-parser
+    allow server to perform curd operation on client cookies
+
+7. ### mongoose-aggregate-paginate-v2
+    used to write aggregation queries 
+
+8. ### bcrypt
+    used to hash passwords
+
+9. ### jsonwebtoken
+    used to create JSON web tokens (JWTs)
+    
+10. ###  
 
 ---
 
@@ -27,3 +42,9 @@
 - app.on('eventName',callbackfn) is used to handle custom events and events are emitted by app.emit('eventName')
 
 - app.use() is used to add middlewares and configure settings
+
+- higher order function is the one which either 
+    1. takes function as an argument 
+    2. returns another function 
+
+- Error is a predefined class 
