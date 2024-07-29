@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
 
 //trigger the custom events
 app.emit("ready"); // it's a predefined event
-// app.emit("errr");
+// app.emit("errr"); //it's user(our) defined event
 
 //starts the server
 app.listen(process.env.PORT, () => {
