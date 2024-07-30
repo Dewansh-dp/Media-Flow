@@ -68,4 +68,6 @@
 
 -  uploading the media files first to the local diskstorage and then uploading it to the cloudinary and deleting(unlink) the files which were not uploaded from local to cloudinary
 
+- multer.diskStorage({}) have two options only (destination,filename)
+
 - 
