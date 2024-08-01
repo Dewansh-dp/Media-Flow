@@ -70,4 +70,4 @@
 
 - multer.diskStorage({}) have two options only (destination,filename)
 
-- 
+- if we write a URL on chrome browser, only GET request will give us response and to get response of the POST request we have to use thunder client or postman

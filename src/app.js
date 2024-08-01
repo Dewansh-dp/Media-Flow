@@ -38,7 +38,12 @@ app.get("/", (req, res) => {
 app.emit("ready"); // it's a predefined event
 // app.emit("errr"); //it's user(our) defined event
 
-//starts the server
-app.listen(process.env.PORT, () => {
-   console.log("port is 3000");
-});
+// routes import
+import userRouter from "./routes/user.routes.js";
+
+// routes declaration
+app.use("/api/v1/users", userRouter);
+//http://localhost:8000/api/v1/users/register
+
+
+export { app };
