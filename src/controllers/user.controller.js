@@ -4,6 +4,22 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+//this is a local funtion to generate token
+const generateAccessAndRefreshToken = async (userId) => {
+   try {
+      const user = await User.findById(userId);
+      const accessToken = user.generateAccessToken();
+      const refreshToken = user.generateRefreshToken();
+
+      user.refreshToken = refreshToken;
+      await user.save({ validateBeforeSave: false });
+
+      return { accessToken, refreshToken };
+   } catch (error) {
+      throw new ApiError(500, "Something went wrong while generating token");
+   }
+};
+
 const registerUser = asyncHandler(async (req, res) => {
    /*    Algorithm for registering user
    get user details from frontend {fullname ,username,password,email}
@@ -90,9 +106,72 @@ const registerUser = asyncHandler(async (req, res) => {
    if (!createdUser) {
       throw new ApiError(500, "Something went wrong while registering user");
    }
-   
+   console.log(User);
+
    res.status(201).json(
       new ApiResponse(200, createdUser, "User resgistered successfully")
    );
+});
+
+const loginUser = asyncHandler(async (req, res) => {
+   /* 
+      taking data from the user (email,username,password)
+      find user in db
+      password check
+      generate access and refresh token 
+      send cookies
+   */
+
+   const { userName, email, password } = req.body;
+
+   //checking if we have the required data
+   if (!userName || !password) {
+      throw new ApiError(400, "Username or password is required");
+   }
+
+   //finding user in db
+   const user = await User.findOne({
+      $or: [{ userName }, { email }],
+   });
+
+   if (!user) {
+      throw new ApiError(400, "User does not exist");
+   }
+
+   //checking if the password is correct
+   const isPasswordValid = await user.isPasswordCorrect(password);
+   if (!isPasswordValid) {
+      throw new ApiError(404, "Invalid user credentials");
+   }
+
+   //generating refresh and access token via local funtion
+   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id
+   );
+
+   //getting the updated user which now have the refreshToken
+   //we can also get the updated user from the above code as well
+   const loggedInUser = await User.findById(user._id).select(
+      "-password -refreshToken"
+   );
+
+   const options = {
+      http: true,
+      secure: true,
+   };
+   res.status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(
+         new ApiResponse(
+            200,
+            {
+               user: loggedInUser,
+               refreshToken,
+               accessToken,
+            },
+            "User loggedin successfully"
+         )
+      );
 });
 export { registerUser };
