@@ -6,7 +6,7 @@ const router = Router();
 
 router.route("/register").post(
    upload.fields([
-      // we cannot use upload.array() because it takes multiple args(files) in one sigle field only
+      // we cannot use upload.array() because it takes multiple args(files) in one single field only
       {
          name: "avatar",
          maxCount: 1,
