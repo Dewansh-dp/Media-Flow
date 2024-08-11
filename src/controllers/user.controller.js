@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { json } from "express";
 
 //this is a local funtion to generate token
 const generateAccessAndRefreshToken = async (userId) => {
@@ -11,7 +12,9 @@ const generateAccessAndRefreshToken = async (userId) => {
       const accessToken = user.generateAccessToken();
       const refreshToken = user.generateRefreshToken();
 
+      // inserting the token in user object
       user.refreshToken = refreshToken;
+      //we have not validated user before saving it to the db because of the pre-middleware("save") that will encrypt password always when we save a user
       await user.save({ validateBeforeSave: false });
 
       return { accessToken, refreshToken };
@@ -37,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
    const { userName, fullName, password, email } = req.body;
    console.log(userName, fullName, password, email);
    //   {avatar,coverImage are taken from the multer middleware }
-   // console.log(req.body);
+   // console.log(req.files, req.route, req.body);
 
    //validation of the fields if they are empty
    // if(userName==="") (writing same if condition for all the fields is same as below codition)
@@ -106,7 +109,7 @@ const registerUser = asyncHandler(async (req, res) => {
    if (!createdUser) {
       throw new ApiError(500, "Something went wrong while registering user");
    }
-   console.log(User);
+   // console.log(User);
 
    res.status(201).json(
       new ApiResponse(200, createdUser, "User resgistered successfully")
@@ -123,10 +126,11 @@ const loginUser = asyncHandler(async (req, res) => {
    */
 
    const { userName, email, password } = req.body;
+   // console.log(userName, email, password);
 
    //checking if we have the required data
-   if (!userName || !password) {
-      throw new ApiError(400, "Username or password is required");
+   if (!(userName || email) && !password) {
+      throw new ApiError(400, "Username or email and password are required");
    }
 
    //finding user in db
@@ -149,6 +153,8 @@ const loginUser = asyncHandler(async (req, res) => {
       user._id
    );
 
+   // console.log(user);
+
    //getting the updated user which now have the refreshToken
    //we can also get the updated user from the above code as well
    const loggedInUser = await User.findById(user._id).select(
@@ -156,6 +162,7 @@ const loginUser = asyncHandler(async (req, res) => {
    );
 
    const options = {
+      // frontend(user) will not be able to modify cookies only the server can
       http: true,
       secure: true,
    };
@@ -173,11 +180,38 @@ const loginUser = asyncHandler(async (req, res) => {
             "User loggedin successfully"
          )
       );
+   // console.log(req.cookies.refreshToken);
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
+   const updated_user = await User.findByIdAndUpdate(
+      // we have inserted user in the req via auth.middleware
+      req.user._id,
+      {
+         // $set: {
+         // mongodb by default ignores the values like undefined, hence the $set will have no effect
+         //    refreshToken: "undefined",
+         // },
+         $unset: {
+            // used to remove the field
+            refreshToken: 1,
+         },
+      },
+      {
+         // "new" returns the new updated user with refreshToken set undefined
+         new: true,
+      }
+   );
+   const options = {
+      http: true,
+      secure: true,
+   };
+   // console.log(updated_user);
 
-   
-   
+   res.status(200)
+      .clearCookie("accessToken", "", options)
+      .clearCookie("refreshToken", "", options)
+      .json(new ApiResponse(200, {}, "User logged out"));
 });
+
 export { registerUser, loginUser, logoutUser };
