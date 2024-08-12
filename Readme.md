@@ -68,6 +68,12 @@
 
 -  uploading the media files first to the local diskstorage and then uploading it to the cloudinary and deleting(unlink) the files which were not uploaded from local to cloudinary
 
-- multer.diskStorage({}) have two options only (destination,filename)
+-  multer.diskStorage({}) have two options only (destination,filename)
 
-- if we write a URL on chrome browser, only GET request will give us response and to get response of the POST request we have to use thunder client or postman
+-  if we write a URL on chrome browser, only GET request will give us response and to get response of the POST request we have to use thunder client or postman
+
+-  cookies are accessed two ways (req and res both have access)
+
+-  if 'undefined' value is added to the cookies then they are stored like string "undefined"
+
+-
