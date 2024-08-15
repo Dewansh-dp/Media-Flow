@@ -1,10 +1,12 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+   uploadOnCloudinary,
+   deleteFromCloudinary,
+} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import { application } from "express";
 
 //this is a local funtion to generate token
 const generateAccessAndRefreshToken = async (userId) => {
@@ -344,6 +346,14 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
+   // deleting old avatar from cloudinary
+   const oldAvatarUrl = req.user?.avatar;
+   const urlArray = oldAvatarUrl.split("/");
+   const filename = urlArray.pop();
+   const oldAvatarPublicId = filename.split(".")[0];
+   // console.log("oldAvatarPublicId", oldAvatarPublicId);
+   await deleteFromCloudinary(oldAvatarPublicId);
+
    // here we have used "file" instead of "files" because we are uploading a single file only
    const avatarLocalPath = req.file?.path;
 
@@ -357,16 +367,30 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Error while uploading avatar");
    }
 
-   const user = User.findByIdAndUpdate(req.user?._id, {
-      $set: {
-         avatar: avatar.url,
+   const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+         $set: {
+            avatar: avatar.url,
+         },
       },
-   }).select("-password -refreshToken");
+      { new: true }
+   ).select("-password -refreshToken");
 
-   res.status(200).json(200, user, "Avatar updated successfully");
+   res.status(200).json(
+      new ApiResponse(200, user, "Avatar updated successfully")
+   );
 });
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
+   // deleting old coverImage from cloudinary
+   const oldCoverImageUrl = req.user?.coverImage;
+   const urlArray = oldCoverImageUrl.split("/");
+   const filename = urlArray.pop();
+   const oldCoverImagePublicId = filename.split(".")[0];
+   // console.log("oldCoverImagePublicId", oldCoverImagePublicId);
+   await deleteFromCloudinary(oldCoverImagePublicId);
+
    // here we have used "file" instead of "files" because we are uploading a single file only
    const coverImageLocalPath = req.file?.path;
 
@@ -380,13 +404,19 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Error while uploading cover image");
    }
 
-   const user = User.findByIdAndUpdate(req.user?._id, {
-      $set: {
-         coverImage: coverImage.url,
+   const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+         $set: {
+            coverImage: coverImage.url,
+         },
       },
-   }).select("-password -refreshToken");
+      { new: true }
+   ).select("-password -refreshToken");
 
-   res.status(200).json(200, user, "Cover Image updated successfully");
+   res.status(200).json(
+      new ApiResponse(200, user, "Cover Image updated successfully")
+   );
 });
 
 export {

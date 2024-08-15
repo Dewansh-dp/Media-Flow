@@ -1,6 +1,7 @@
 // in this file we are receiving path of media (this is on local server) and uploading it to the cloudinary
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { ApiError } from "./ApiError.js";
 
 // Configuration of cloudinary
 cloudinary.config({
@@ -27,4 +28,23 @@ const uploadOnCloudinary = async (localFilePath) => {
    }
 };
 
-export { uploadOnCloudinary };
+const deleteFromCloudinary = async (publicId) => {
+   try {
+      if (!publicId) {
+         throw new ApiError(401, "Please provide public id");
+      }
+
+      const result = await cloudinary.uploader.destroy(publicId);
+      console.log("File deleted", result);
+
+      return result;
+   } catch (error) {
+      throw new ApiError(
+         500,
+         error?.message ||
+            "Something went wrong while deleting file on cloudinary"
+      );
+   }
+};
+
+export { uploadOnCloudinary, deleteFromCloudinary };
