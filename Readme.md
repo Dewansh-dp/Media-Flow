@@ -76,4 +76,9 @@
 
 -  if 'undefined' value is added to the cookies then they are stored like string "undefined"
 
--
+-  we are setting cookie maxAge(takes value in milliseconds) that is the expiry of the cookie
+   we can also use expires(takes Date value) attribute to set the expiry
+   but do not confuse with the jwt token expiry
+   -  JWT and Cookies both have their own exipry and we have set both
+
+- all dotenv variables become type string

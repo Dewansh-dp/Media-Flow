@@ -7,7 +7,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
    // res is replaced with '_' because it was not getting used
    try {
       //getting token from the cookies or from the header
-      // header have authorization field like this "Authorization":"Bearer <token>", so we are removing the "Bearer " before the token
+      // req.header have authorization field like this "Authorization":"Bearer <token>", so we are removing the "Bearer " before the token
       const token =
          req.cookies?.accessToken ||
          req.header("Authorization")?.replace("Bearer ", "");
@@ -30,7 +30,6 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
 
       req.user = user;
       next();
-
    } catch (error) {
       throw new ApiError(401, error?.message || "Invalid Access token");
    }

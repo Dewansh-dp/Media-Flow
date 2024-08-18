@@ -1,9 +1,12 @@
 import { Router } from "express";
 import {
+   changeCurrentPassword,
+   getCurrentUser,
    loginUser,
    logoutUser,
    refreshAccessToken,
    registerUser,
+   updateAccountDetails,
    updateUserAvatar,
    updateUserCoverImage,
 } from "../controllers/user.controller.js";
@@ -37,9 +40,15 @@ router.route("/refresh-token").post(refreshAccessToken);
 router
    .route("/update-avatar")
    .post(verifyJWT, upload.single("avatar"), updateUserAvatar);
-   
+
 router
    .route("/update-cover-image")
    .post(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
+
+router.route("/get-current-user").get(verifyJWT, getCurrentUser);
+
+router.route("/update-account-details").post(verifyJWT, updateAccountDetails);
+
+router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
 export default router;

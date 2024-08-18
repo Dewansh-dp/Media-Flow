@@ -169,8 +169,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
    const options = {
       // frontend(user) will not be able to modify cookies only the server can
-      http: true,
+      httpOnly: true,
       secure: true,
+      maxAge: Number(process.env.COOKIE_EXPIRY), //(10 days ,time in ms)
    };
    res.status(200)
       .cookie("accessToken", accessToken, options)
@@ -223,7 +224,7 @@ const logoutUser = asyncHandler(async (req, res) => {
    // console.log(updated_user);
 
    const options = {
-      http: true,
+      httpOnly: true,
       secure: true,
    };
    // console.log(updated_user);
@@ -276,7 +277,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
          user._id
       );
 
-      const options = { httpOnly: true, secure: true };
+      const options = {
+         httpOnly: true,
+         secure: true,
+         maxAge: Number(process.env.COOKIE_EXPIRY), //(10 days ,time in ms)
+      };
       res.status(200)
          .cookie("accessToken", accessToken, options)
          .cookie("refreshToken", refreshToken, options)
@@ -297,7 +302,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
    const { oldPassword, newPassword } = req.body;
 
-   const user = User.findById(req.user?._id);
+   const user = await User.findById(req.user?._id);
 
    const isPasswordValid = user.isPasswordCorrect(oldPassword);
 
@@ -312,6 +317,8 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
    res.status(200).json(
       new ApiResponse(200, {}, "Password changed successfully")
    );
+
+   console.log("Password changed");
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -327,7 +334,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Fullname or email is required");
    }
 
-   const user = User.findByIdAndUpdate(
+   const user = await User.findByIdAndUpdate(
       req.user?._id,
       {
          $set: {
@@ -343,6 +350,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    res.status(200).json(
       new ApiResponse(200, user, "Account details updated successfully")
    );
+   console.log("User details updated successfully");
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
