@@ -82,3 +82,5 @@
    -  JWT and Cookies both have their own exipry and we have set both
 
 - all dotenv variables become type string
+
+- 'Content-Disposition', 'attachment; filename="example.pdf"' is used to download files from the server (use res.send(file.data)) here file.data is the buffer data of the file
