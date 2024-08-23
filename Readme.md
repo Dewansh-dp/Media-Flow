@@ -79,8 +79,76 @@
 -  we are setting cookie maxAge(takes value in milliseconds) that is the expiry of the cookie
    we can also use expires(takes Date value) attribute to set the expiry
    but do not confuse with the jwt token expiry
+
    -  JWT and Cookies both have their own exipry and we have set both
 
-- all dotenv variables become type string
+-  all dotenv variables become type String
 
-- 'Content-Disposition', 'attachment; filename="example.pdf"' is used to download files from the server (use res.send(file.data)) here file.data is the buffer data of the file
+-  in mongodb, document refers to the entry or a data
+
+-  validateBeforeSave:"false" will skip the validation checks defined in the Mongoose schema, This refers to the validation of document fields as per schema rules (like required fields, minimum length, etc.). Setting validateBeforeSave: false skips these checks.
+
+-  'Content-Disposition', 'attachment; filename="example.pdf"' is used to download files from the server (use res.send(file.data)) here file.data is the buffer data of the file
+
+-  when we save the model to the database it converts the name of the model to the lowercase and makes it plural. Eg. "Subscriber" changes to "subscribers"
+
+-  whenever we want to take data from the url we use params
+
+-  we take data(username, avatar, etc...) from the params specially while fetching details of the channel because usually we have the channel link available to route to the user channel
+
+---
+
+```javascript
+// for uploading file directly from the memory storage
+router.post("/upload", upload.single("file"), async (req, res) => {
+   try {
+      // Create a new file document
+      // const file = new File({
+      //    filename: req.file.originalname, // File name
+      //    contentType: req.file.mimetype, // MIME type of the file
+      //    data: req.file.buffer, // The file data (Buffer)
+      // });
+      console.log(req.file);
+
+      const file = await File.create({
+         filename: req.file.originalname, // File name
+         contentType: req.file.mimetype, // MIME type of the file
+         data: req.file.buffer, // The file data (Buffer)
+      });
+
+      // Save the file to the database
+      const response = await file.save();
+      // console.log("response", response);
+
+      res.status(200).json({
+         message: "File uploaded successfully",
+         fileId: file._id,
+      });
+   } catch (error) {
+      res.status(500).json({ message: "File upload failed", error });
+   }
+});
+//-------------------------------------------------------------------------
+router.get("/download/:id", async (req, res) => {
+   try {
+      const file = await File.findById(req.params.id);
+
+      if (!file) {
+         return res.status(404).json({ message: "File not found" });
+      }
+
+      // Set the content type and disposition
+      res.set({
+         "Content-Type": file.contentType,
+         "Content-Disposition": `attachment; filename="${file.filename}"`,
+      });
+
+      // console.log(file.data);
+
+      // Send the file data as a response
+      res.send(file.data);
+   } catch (error) {
+      res.status(500).json({ message: "File download failed", error });
+   }
+});
+```

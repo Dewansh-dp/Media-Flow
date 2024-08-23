@@ -427,6 +427,21 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
    );
 });
 
+import mongoose, { mongo } from "mongoose";
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+   const { userName } = req.params;
+
+   // console.log(await User.find({userName}));
+   // const books = mongoose.connection.collection("books");
+   // console.log(await books.findOne({_id:2}));
+   // const r = await books.findOne({ author_id: 100 });
+
+   // const authors = mongoose.connection.collection("authors");
+   // const rs = await authors.find({ _id: 100 }).toArray();
+   // console.log(rs);
+  
+});
+
 export {
    registerUser,
    loginUser,
@@ -437,4 +452,5 @@ export {
    updateAccountDetails,
    updateUserAvatar,
    updateUserCoverImage,
+   getUserChannelProfile,
 };
