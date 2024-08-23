@@ -100,6 +100,20 @@
 
 ```javascript
 // for uploading file directly from the memory storage
+// Configure Multer storage
+const storage = multer.memoryStorage(); // Store files in memory as a Buffer
+
+export const upload = multer({ storage: storage });
+
+const fileSchema = new Schema({
+   filename: { type: String, required: true },
+   contentType: { type: String, required: true },
+   data: { type: Buffer, required: true }, // Store file data as a binary Buffer
+   uploadDate: { type: Date, default: Date.now },
+});
+
+export const File = mongoose.model("File", fileSchema);
+//--------------------------------------------------------------------
 router.post("/upload", upload.single("file"), async (req, res) => {
    try {
       // Create a new file document

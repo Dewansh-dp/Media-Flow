@@ -427,19 +427,82 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
    );
 });
 
-import mongoose, { mongo } from "mongoose";
 const getUserChannelProfile = asyncHandler(async (req, res) => {
    const { userName } = req.params;
 
-   // console.log(await User.find({userName}));
-   // const books = mongoose.connection.collection("books");
-   // console.log(await books.findOne({_id:2}));
-   // const r = await books.findOne({ author_id: 100 });
+   if (!userName?.trim()) {
+      throw new ApiError(400, "username is missing");
+   }
 
-   // const authors = mongoose.connection.collection("authors");
-   // const rs = await authors.find({ _id: 100 }).toArray();
-   // console.log(rs);
-  
+   const channel = User.aggregate([
+      {
+         $match: {
+            userName: userName?.toLowerCase(),
+         },
+      },
+      {
+         // calculating subscribers (gathering all the documents)
+         $lookup: {
+            from: "subscriptions",
+            localField: "_id",
+            foreignField: "channel",
+            as: "subscribers",
+         },
+      },
+      {
+         // calculating subscribedTo (gathering all the documents)
+         $lookup: {
+            from: "subscriptions", // mongodb converted "Subscription" schema to "subscriptions"
+            localField: "_id",
+            foreignField: "subscriber",
+            as: "subscribedTo",
+         },
+      },
+      {
+         $addFields: {
+            // counting subscribers (counting total documents)
+            subscribersCount: {
+               $size: "$subscribers",
+            },
+
+            // counting channelSubscribedTo (counting total documents)
+            channelsSubscribedToCount: {
+               $size: "$subscribedTo",
+            },
+
+            // sending a message to the frontend that the user is subscribed to the visiting channel or not
+            isSubscribed: {
+               // $cond is the condition (if?then:else)
+               $cond: {
+                  // subscribers field is an object so we can access the subscriber
+                  if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                  then: true,
+                  else: false,
+               },
+            },
+         },
+      },
+      {
+         $project: {
+            userName: 1,
+            fullName: 1,
+            email: 1,
+            avatar: 1,
+            coverImage: 1,
+            subscribersCount: 1,
+            channelsSubscribedToCount: 1,
+            isSubscribed: 1,
+         },
+      },
+   ]);
+
+   if (!channel?.length) {
+      throw new ApiError(404, "Channel does not exists");
+   }
+
+   res.status(200).json(
+      new ApiResponse(200, channel[0], "User channel fetched successfully")
+   );
 });
 
 export {
