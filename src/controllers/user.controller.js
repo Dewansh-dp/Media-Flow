@@ -7,6 +7,7 @@ import {
 } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 //this is a local funtion to generate token
 const generateAccessAndRefreshToken = async (userId) => {
@@ -474,7 +475,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             isSubscribed: {
                // $cond is the condition (if?then:else)
                $cond: {
-                  // subscribers field is an object so we can access the subscriber
+                  // subscribers field is an object(array of objects) so we can access the subscriber
+                  // in mongodb we can search for the obejcts inside array like $fieldNameOfDocument.objectField
                   if: { $in: [req.user?._id, "$subscribers.subscriber"] },
                   then: true,
                   else: false,
@@ -495,6 +497,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
          },
       },
    ]);
+   //console.log channel
 
    if (!channel?.length) {
       throw new ApiError(404, "Channel does not exists");
@@ -502,6 +505,63 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
    res.status(200).json(
       new ApiResponse(200, channel[0], "User channel fetched successfully")
+   );
+});
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+   // req.user._id gives us the "string" not the objectId( mongoose converts string into the objectId internally)
+   const user = await User.aggregate([
+      {
+         $match: { _id: new mongoose.Schema.Types.ObjectId(req.user._id) },
+      },
+      {
+         $lookup: {
+            from: "videos",
+            localField: "watchHistory",
+            foreignField: "_id",
+            as: "watchHistory",
+            pipeline: [
+               // this is a subpipeline for the owner field in videos
+               //we are inside videos schema
+               {
+                  $lookup: {
+                     from: "users",
+                     localField: "owner",
+                     foreignField: "_id",
+                     as: "owner",
+                     pipeline: [
+                        {
+                           $project: {
+                              userName: 1,
+                              fullName: 1,
+                              avatar: 1,
+                           },
+                        },
+                     ],
+                  },
+               },
+               {
+                  $addFields: {
+                     // this is only written for taking out data from the arrays first element
+                     owner: {
+                        $first: "$owner",
+                        // $arrayElemAt: ["$owner", 0],  // this work same as above
+                     },
+                  },
+               },
+            ],
+         },
+      },
+   ]);
+
+   // log user
+
+   res.status(200).json(
+      new ApiResponse(
+         200,
+         user[0].watchHistory,
+         "Watch history fetched successfully"
+      )
    );
 });
 
@@ -516,4 +576,5 @@ export {
    updateUserAvatar,
    updateUserCoverImage,
    getUserChannelProfile,
+   getWatchHistory,
 };
