@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
    changeCurrentPassword,
    downloadAvatar,
+   downloadCoverImage,
    getCurrentUser,
    getUserChannelProfile,
    getWatchHistory,
@@ -58,6 +59,8 @@ router.route("/channel/:userName").get(verifyJWT, getUserChannelProfile);
 
 router.route("/watch-history").get(verifyJWT, getWatchHistory);
 
-router.route("/download-avatar").get(verifyJWT,downloadAvatar);
+router.route("/download-avatar").get(verifyJWT, downloadAvatar);
+
+router.route("/download-cover-image").get(verifyJWT, downloadCoverImage);
 
 export default router;

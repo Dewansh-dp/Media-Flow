@@ -166,3 +166,40 @@ router.get("/download/:id", async (req, res) => {
    }
 });
 ```
+
+-  To download files locally from the database we use the following
+
+   1. #### fs
+      used to create write stream
+   2. #### axios
+      used to send http request via code to the cloudinary server using url
+   3. #### path
+      used to convert the path in the correct manner because the path we provide it contains "/" but needed path is in the form "\" so to convert it we used path.join()
+
+-  ```javascript
+   /* Downloading file locally */
+
+   //local path of the directory where we want to download the file
+   const dirName = "./public/temp";
+   // the above path is not a valid path it should use "\" instead of "/"
+   // to do so we use path.join()
+   const localPath = path.join(dirName, "Downloaded File.jpg");
+
+   response.data.pipe(fs.createWriteStream(localPath));
+   ```
+
+-  Download file (serving file fetched from cloudinary server directly to the client)
+
+   -  ```js
+      // sending file directly to the client
+      res.set({
+         "content-type": response.headers.getContentType(),
+         "content-disposition": `attachment; filename="Fetched from DB.png"`,
+      });
+
+      // response.data is a readable stream
+      // pipe method allows to connect readable stream to a writable stream
+      // res is a writable stream (we can write data to it)
+      response.data.pipe(res);
+      res.status(200);
+      ```

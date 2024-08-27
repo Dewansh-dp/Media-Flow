@@ -8,6 +8,9 @@ import {
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import path from "path";
+import axios from "axios";
+import fs from "fs";
 
 //this is a local funtion to generate token
 const generateAccessAndRefreshToken = async (userId) => {
@@ -565,6 +568,63 @@ const getWatchHistory = asyncHandler(async (req, res) => {
    );
 });
 
+const downloadAvatar = asyncHandler(async (req, res) => {
+   const url = req.user.avatar;
+   console.log(url);
+   
+   const response = await axios.get(url, { responseType: "stream" });
+   console.log("in");
+
+   /* Downloading file locally 
+
+      //local path of the directory where we want to download the file
+      const dirName = "./public/temp";
+      // the above path is not a valid path it should use "\" instead of "/"
+      // to do so we use path.join()
+      const localPath = path.join(dirName, "Downloaded File.jpg");
+      response.data.pipe(fs.createWriteStream(localPath));
+
+   */
+   res.set({
+      "content-type": response.headers.getContentType(),
+      "content-disposition": `attachment; filename="Fetched from DB.png"`,
+   });
+
+   // response.data is a readable stream
+   // pipe method allows to connect readable stream to a writable stream
+   // res is a writable stream (we can write data to it)
+   response.data.pipe(res);
+   res.status(200);
+});
+const downloadCoverImage = asyncHandler(async (req, res) => {
+   const url = req.user.coverImage;
+   
+   const response = await axios.get(url, { responseType: "stream" });
+   console.log("in");
+
+   /* Downloading file locally 
+
+      //local path of the directory where we want to download the file
+      const dirName = "./public/temp";
+      // the above path is not a valid path it should use "\" instead of "/"
+      // to do so we use path.join()
+      const localPath = path.join(dirName, "Downloaded File.jpg");
+      response.data.pipe(fs.createWriteStream(localPath));
+
+   */
+   res.set({
+      "content-type": response.headers.getContentType(),
+      "content-disposition": `attachment; filename="Fetched from DB.png"`,
+   });
+
+   // response.data is a readable stream
+   // pipe method allows to connect readable stream to a writable stream
+   // res is a writable stream (we can write data to it)
+   response.data.pipe(res);
+   res.status(200);
+});
+
+
 export {
    registerUser,
    loginUser,
@@ -577,4 +637,6 @@ export {
    updateUserCoverImage,
    getUserChannelProfile,
    getWatchHistory,
+   downloadAvatar,
+   downloadCoverImage
 };
