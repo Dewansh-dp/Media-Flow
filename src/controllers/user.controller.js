@@ -596,6 +596,7 @@ const downloadAvatar = asyncHandler(async (req, res) => {
    response.data.pipe(res);
    res.status(200);
 });
+
 const downloadCoverImage = asyncHandler(async (req, res) => {
    const url = req.user.coverImage;
    
