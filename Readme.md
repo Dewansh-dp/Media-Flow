@@ -41,7 +41,11 @@
       used for uploading file
 
 11.   ### cloudinary
+
       is a service used to store the media on its server
+
+12.   ### Model
+      https://app.eraser.io/workspace/yxxMC8OYXuNwvVKaTuSt?origin=share
 
 ---
 
@@ -69,6 +73,8 @@
 -  uploading the media files first to the local diskstorage and then uploading it to the cloudinary and deleting(unlink) the files which were not uploaded from local to cloudinary
 
 -  multer.diskStorage({}) have two options only (destination,filename)
+
+-  urlencoded({extended:true}) parse the incoming data from the req into the js object(output is available in req.body) and extended true means it is using qs library for handling complex querystring
 
 -  if we write a URL on chrome browser, only GET request will give us response and to get response of the POST request we have to use thunder client or postman
 
