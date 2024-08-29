@@ -576,10 +576,8 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 
 const downloadAvatar = asyncHandler(async (req, res) => {
    const url = req.user.avatar;
-   console.log(url);
 
    const response = await axios.get(url, { responseType: "stream" });
-   console.log("in");
 
    /* Downloading file locally 
 
@@ -607,7 +605,6 @@ const downloadCoverImage = asyncHandler(async (req, res) => {
    const url = req.user.coverImage;
 
    const response = await axios.get(url, { responseType: "stream" });
-   console.log("in");
 
    /* Downloading file locally 
 
