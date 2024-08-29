@@ -438,7 +438,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       throw new ApiError(400, "username is missing");
    }
 
-   const [channel] = await User.aggregate([
+   const channel = await User.aggregate([
       {
          $match: {
             userName: userName?.toLowerCase(),
@@ -506,15 +506,17 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
    }
 
    res.status(200).json(
-      new ApiResponse(200, channel, "User channel fetched successfully")
+      new ApiResponse(200, channel[0], "User channel fetched successfully")
    );
 });
 
 const getWatchHistory = asyncHandler(async (req, res) => {
-   // req.user._id gives us the "string" not the objectId( mongoose converts string into the objectId internally)
    const user = await User.aggregate([
       {
-         $match: { _id: new mongoose.Schema.Types.ObjectId(req.user._id) },
+         // req.user._id gives us the "string" not the objectId (mongoose converts string into the objectId internally)
+         // to find the $match via _id we have to use the actual type ObjectId because mongoose dont convert the aggregate data which we pass on
+         // $match: { _id: new mongoose.Schema.Types.ObjectId(req.user._id) },
+         $match: { _id: req.user?._id },
       },
       {
          $lookup: {
@@ -526,6 +528,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                // this is a subpipeline for the owner field in videos
                //we are inside videos schema
                {
+                  // this is to insert the owner details (user details)
                   $lookup: {
                      from: "users",
                      localField: "owner",
@@ -533,6 +536,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                      as: "owner",
                      pipeline: [
                         {
+                           // this projection is for the field 'owner'
                            $project: {
                               userName: 1,
                               fullName: 1,
@@ -544,7 +548,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                },
                {
                   $addFields: {
-                     // this is only written for taking out data from the arrays first element
+                     // this is only written for taking out data from the arrays first element (i.e. destructuring the array)
                      owner: {
                         $first: "$owner",
                         // $arrayElemAt: ["$owner", 0],  // this work same as above
@@ -554,9 +558,14 @@ const getWatchHistory = asyncHandler(async (req, res) => {
             ],
          },
       },
+      {
+         $project: {
+            watchHistory: 1,
+         },
+      },
    ]);
 
-   // log user
+   console.log(user);
 
    res.status(200).json(
       new ApiResponse(
