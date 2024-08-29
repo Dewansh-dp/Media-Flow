@@ -45,7 +45,7 @@
       is a service used to store the media on its server
 
 12.   ### Model
-      https://app.eraser.io/workspace/yxxMC8OYXuNwvVKaTuSt?origin=share
+      [Link for model](https://app.eraser.io/workspace/yxxMC8OYXuNwvVKaTuSt?origin=share)
 
 ---
 
@@ -67,6 +67,17 @@
    2. returns another function
 
 -  Error is a predefined class in node
+
+-  Connection to the database without having the collection schema
+
+   ```js
+   await mongoose
+      .connect("connection_string/database_name")
+      .then(() => console.log("connected with db"));
+
+   const db = mongoose.connection.db;
+   const User = db.collection("users");
+   ```
 
 -  we have generated access token from SHA256
 
