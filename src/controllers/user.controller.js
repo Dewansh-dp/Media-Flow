@@ -438,10 +438,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       throw new ApiError(400, "username is missing");
    }
 
-   // console.log(req.user.);
-   console.log(User);
-   
-
    const [channel] = await User.aggregate([
       {
          $match: {
