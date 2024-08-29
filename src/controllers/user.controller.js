@@ -99,9 +99,9 @@ const registerUser = asyncHandler(async (req, res) => {
 
    const user = await User.create({
       fullName,
-      avatar: avatar.url,
+      avatar: avatar.secure_url,
       // if coverImage url is not present then leave empty string
-      coverImage: coverImage?.url || "",
+      coverImage: coverImage?.secure_url || "",
       userName: userName.toLowerCase(),
       password,
       email,
@@ -420,7 +420,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
       req.user?._id,
       {
          $set: {
-            coverImage: coverImage.url,
+            coverImage: coverImage.secure_url,
          },
       },
       { new: true }
@@ -438,7 +438,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       throw new ApiError(400, "username is missing");
    }
 
-   const channel = User.aggregate([
+   const channel = await User.aggregate([
       {
          $match: {
             userName: userName?.toLowerCase(),
@@ -500,7 +500,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
          },
       },
    ]);
-   //console.log channel
 
    if (!channel?.length) {
       throw new ApiError(404, "Channel does not exists");
@@ -571,7 +570,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 const downloadAvatar = asyncHandler(async (req, res) => {
    const url = req.user.avatar;
    console.log(url);
-   
+
    const response = await axios.get(url, { responseType: "stream" });
    console.log("in");
 
@@ -599,7 +598,7 @@ const downloadAvatar = asyncHandler(async (req, res) => {
 
 const downloadCoverImage = asyncHandler(async (req, res) => {
    const url = req.user.coverImage;
-   
+
    const response = await axios.get(url, { responseType: "stream" });
    console.log("in");
 
@@ -625,7 +624,6 @@ const downloadCoverImage = asyncHandler(async (req, res) => {
    res.status(200);
 });
 
-
 export {
    registerUser,
    loginUser,
@@ -639,5 +637,5 @@ export {
    getUserChannelProfile,
    getWatchHistory,
    downloadAvatar,
-   downloadCoverImage
+   downloadCoverImage,
 };
