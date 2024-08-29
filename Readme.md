@@ -113,6 +113,8 @@
 
 -  we take data(username, avatar, etc...) from the params specially while fetching details of the channel because usually we have the channel link available to route to the user channel
 
+- whenever using aggregation use '$' when referring to the field and use "$$" when referring to the variable
+
 ---
 
 ```javascript
