@@ -55,7 +55,7 @@ router.route("/update-account-details").patch(verifyJWT, updateAccountDetails);
 
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
-router.route("/channel/:userName").get(verifyJWT, getUserChannelProfile);
+router.route("/channel/:userName").get(getUserChannelProfile);
 
 router.route("/watch-history").get(verifyJWT, getWatchHistory);
 
