@@ -1,3 +1,5 @@
+import axios from "axios";
+import { User } from "../models/user.model.js";
 import { Video } from "../models/video.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -51,4 +53,19 @@ const publishVideo = asyncHandler(async (req, res) => {
    console.log("Video published");
 });
 
-export { publishVideo };
+const getVideoById = asyncHandler(async (req, res) => {
+   const videoDocument = await Video.findById(req.params.id);
+   const url = videoDocument.videoFile;
+   const response = await axios.get(url, { responseType: "stream" });
+
+   res.set({
+      "content-type": response.headers.getContentType(),
+      "content-disposition": `inline; filename:"video.mp4"`,
+   });
+   response.data.pipe(res)
+   res.status(200);
+});
+
+
+
+export { publishVideo, getVideoById };
