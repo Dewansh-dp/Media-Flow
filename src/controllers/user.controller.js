@@ -7,7 +7,6 @@ import {
 } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import path from "path";
 import axios from "axios";
 import fs from "fs";
@@ -87,8 +86,11 @@ const registerUser = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Avatar file is required");
    }
 
-   const avatar = await uploadOnCloudinary(avatarLocalPath);
-   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+   const avatar = await uploadOnCloudinary(avatarLocalPath, "Youtube/Users");
+   const coverImage = await uploadOnCloudinary(
+      coverImageLocalPath,
+      "Youtube/Users"
+   );
 
    // console.log(avatar);
    // console.log(coverImage);
@@ -373,7 +375,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Avatar file is missing");
    }
 
-   const avatar = await uploadOnCloudinary(avatarLocalPath);
+   const avatar = await uploadOnCloudinary(avatarLocalPath, "Youtube/Users");
 
    if (!avatar.url) {
       throw new ApiError(400, "Error while uploading avatar");
@@ -410,7 +412,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Cover image file is missing");
    }
 
-   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+   const coverImage = await uploadOnCloudinary(
+      coverImageLocalPath,
+      "Youtube/Users"
+   );
 
    if (!coverImage.url) {
       throw new ApiError(400, "Error while uploading cover image");
