@@ -115,6 +115,7 @@
 
 - whenever using mongoDB aggregation use '$' when referring to the field and use "$$" when referring to the variable
 
+- It is mandatory to handle incoming files using multer when sending form-data, if not done then the body will always be empty  
 ---
 
 ```javascript
