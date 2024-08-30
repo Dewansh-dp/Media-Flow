@@ -45,6 +45,12 @@ const userSchema = new Schema(
       refreshToken: {
          type: String,
       },
+      uploads: [
+         {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Video",
+         },
+      ],
    },
    { timestamps: true }
 );
