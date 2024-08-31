@@ -10,7 +10,6 @@ import {
 } from "../utils/cloudinary.js";
 
 const getPublicId = function (url) {
-
    const fileArray = url.split("/");
    const idWithExtension = fileArray.pop();
    const id = idWithExtension.split(".");
@@ -133,7 +132,14 @@ const deleteVideo = asyncHandler(async (req, res) => {
    const videoId = req.params.id;
 
    // deleting from the user.uploads
-   await User.updateOne({ _id: req.user._id }, { $pull: { uploads: videoId } });
+   const response = await User.updateOne(
+      { uploads: [videoId] },
+      { $pull: { uploads: videoId } }
+   );
+
+   if (!response.matchedCount) {
+      throw new ApiError(400, "Video not found");
+   }
 
    // deleting video
    const { videoFile, thumbnail } = await Video.findByIdAndDelete(videoId);
