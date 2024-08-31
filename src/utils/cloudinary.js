@@ -11,13 +11,13 @@ cloudinary.config({
    secure: true, // sends https links as response
 });
 
-const uploadOnCloudinary = async (localFilePath, folder = undefined) => {
+const uploadOnCloudinary = async (localFilePath, folder) => {
    try {
       if (!localFilePath) return null;
       // upload file on cloudinary
       const response = await cloudinary.uploader.upload(localFilePath, {
          resource_type: "auto", // this is type of resource
-         folder: folder,
+         folder: folder, // used to upload file in particular folder
       });
       // file has been uploaded successfully
       console.log("file is uploaded on cloudinary", response.secure_url);
