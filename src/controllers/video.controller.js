@@ -10,6 +10,7 @@ import {
 } from "../utils/cloudinary.js";
 
 const getPublicId = function (url) {
+
    const fileArray = url.split("/");
    const idWithExtension = fileArray.pop();
    const id = idWithExtension.split(".");
@@ -147,6 +148,8 @@ const deleteVideo = asyncHandler(async (req, res) => {
    res.status(200).json(
       new ApiResponse(200, null, "Video deleted successfully")
    );
+
+   console.log("Video deleted");
 });
 
 export { publishVideo, getVideoById, updateVideo, deleteVideo };
