@@ -30,13 +30,15 @@ const uploadOnCloudinary = async (localFilePath, folder = undefined) => {
    }
 };
 
-const deleteFromCloudinary = async (publicId) => {
+const deleteFromCloudinary = async (publicId, resource_type) => {
    try {
       if (!publicId) {
          throw new ApiError(401, "Please provide public id");
       }
 
-      const result = await cloudinary.uploader.destroy(publicId);
+      const result = await cloudinary.uploader.destroy(publicId, {
+         resource_type: resource_type,
+      });
       console.log("Delete file", result);
 
       return result;

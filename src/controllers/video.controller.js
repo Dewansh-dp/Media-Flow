@@ -8,7 +8,14 @@ import {
    deleteFromCloudinary,
    uploadOnCloudinary,
 } from "../utils/cloudinary.js";
-import { json } from "express";
+
+const getPublicId = function (url) {
+   const fileArray = url.split("/");
+   const idWithExtension = fileArray.pop();
+   const id = idWithExtension.split(".");
+
+   return id[0];
+};
 
 const publishVideo = asyncHandler(async (req, res) => {
    const { title, description } = req.body;
@@ -89,10 +96,7 @@ const updateVideo = asyncHandler(async (req, res) => {
    // obtaining old thumbnail publicId
    const oldThumbnail = await Video.findById(videoId);
    const url = oldThumbnail.thumbnail;
-   const urlArray = url.split("/");
-   const filename = urlArray.pop();
-   const publicId = filename.split(".")[0];
-   const folderPublicId = "Youtube/Videos/" + publicId;
+   const folderPublicId = "Youtube/Videos/" + getPublicId(url);
    console.log(folderPublicId);
 
    // deleting old thumbnail from cloudinary
@@ -124,4 +128,25 @@ const updateVideo = asyncHandler(async (req, res) => {
    console.log("Video updated");
 });
 
-export { publishVideo, getVideoById, updateVideo };
+const deleteVideo = asyncHandler(async (req, res) => {
+   const videoId = req.params.id;
+
+   // deleting from the user.uploads
+   await User.updateOne({ _id: req.user._id }, { $pull: { uploads: videoId } });
+
+   // deleting video
+   const { videoFile, thumbnail } = await Video.findByIdAndDelete(videoId);
+
+   // deleting video and thumbnail from cloudinary
+   await deleteFromCloudinary(
+      "Youtube/Videos/" + getPublicId(videoFile),
+      "video"
+   );
+   await deleteFromCloudinary("Youtube/Videos/" + getPublicId(thumbnail));
+
+   res.status(200).json(
+      new ApiResponse(200, null, "Video deleted successfully")
+   );
+});
+
+export { publishVideo, getVideoById, updateVideo, deleteVideo };

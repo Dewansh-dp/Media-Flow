@@ -116,6 +116,10 @@
 - whenever using mongoDB aggregation use '$' when referring to the field and use "$$" when referring to the variable
 
 - It is mandatory to handle incoming files using multer when sending form-data, if not done then the body will always be empty  
+
+- When a file is inside a folder of cloudinary the public id becomes "Folder_name/Public_Id" 
+
+- It is mandtory to pass resource_type when deleting a file other than image from the cloudinary
 ---
 
 ```javascript
