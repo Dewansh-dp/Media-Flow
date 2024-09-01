@@ -20,7 +20,6 @@ const getPublicId = function (url) {
 const getAllVideos = asyncHandler(async (req, res) => {
    // page ,limit, query ,sortBy,sortType,userId
    const { page, limit, sortBy, sortType, query } = req.query;
-   console.log(req.query);
 
    // do not use await before Video.aggregate
    // using await will result in the application of the pipeline on the documents
