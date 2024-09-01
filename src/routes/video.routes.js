@@ -3,12 +3,15 @@ import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
    deleteVideo,
+   getAllVideos,
    getVideoById,
    publishVideo,
    updateVideo,
 } from "../controllers/video.controller.js";
 
 const router = Router();
+
+router.route("/get-all-videos").get(getAllVideos);
 
 router.route("/publish").post(
    verifyJWT,

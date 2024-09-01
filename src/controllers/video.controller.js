@@ -17,6 +17,37 @@ const getPublicId = function (url) {
    return id[0];
 };
 
+const getAllVideos = asyncHandler(async (req, res) => {
+   // page ,limit, query ,sortBy,sortType,userId
+   const { page, limit, sortBy, sortType, query } = req.query;
+   console.log(req.query);
+
+   // do not use await before Video.aggregate
+   // using await will result in the application of the pipeline on the documents
+   // not using await will keep the pipeline as it is (not filtering documents)
+   const aggregation = Video.aggregate([
+      {
+         $match: query ? JSON.parse(query) : {},
+      },
+      // sortType is in string convert it into Number
+      { $sort: { [sortBy]: Number(sortType) } },
+   ]);
+   console.log("aggregation", aggregation);
+
+   const response = await Video.aggregatePaginate(aggregation, {
+      page,
+      limit,
+   });
+   console.log("response", response);
+   res.status(200).json(
+      new ApiResponse(
+         200,
+         { "Total Docs": response.totalDocs },
+         "Got all videos"
+      )
+   );
+});
+
 const publishVideo = asyncHandler(async (req, res) => {
    const { title, description } = req.body;
 
@@ -28,8 +59,8 @@ const publishVideo = asyncHandler(async (req, res) => {
       throw new ApiError(400, "All fields are required");
    }
 
-   const thumbnailLocalPath = req.files?.thumbnail[0]?.path;
-   const videoFileLocalPath = req.files?.videoFile[0]?.path;
+   const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path;
+   const videoFileLocalPath = req.files?.videoFile?.[0]?.path;
 
    if (!thumbnailLocalPath || !videoFileLocalPath) {
       throw new ApiError(400, "Video and thumbnail are required");
@@ -138,7 +169,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
    );
 
    if (!response.matchedCount) {
-      throw new ApiError(400, "Video not found");
+      throw new ApiError(400, "Video not found in user uploads");
    }
 
    // deleting video
@@ -158,4 +189,4 @@ const deleteVideo = asyncHandler(async (req, res) => {
    console.log("Video deleted");
 });
 
-export { publishVideo, getVideoById, updateVideo, deleteVideo };
+export { publishVideo, getVideoById, updateVideo, deleteVideo, getAllVideos };
