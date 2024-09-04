@@ -22,7 +22,7 @@ const addComment = asyncHandler(async (req, res) => {
    });
 
    if (!comment) {
-      throw new ApiError(400, "Error while generation comment");
+      throw new ApiError(400, "Comment not found");
    }
 
    res.status(200).json(
@@ -30,4 +30,36 @@ const addComment = asyncHandler(async (req, res) => {
    );
 });
 
-export { addComment };
+const updateComment = asyncHandler(async (req, res) => {
+   const { oldContent, content } = req.body;
+   const owner = req.user._id,
+      videoId = req.videoId;
+
+   if (
+      [content, oldContent, videoId, owner].some(
+         (field) => field === undefined || field === null
+      )
+   ) {
+      throw new ApiError(400, "All fields are required");
+   }
+
+   const comment = await Comment.findOneAndUpdate(
+      {
+         content: oldContent,
+         owner,
+         video: videoId,
+      },
+      {
+         content,
+      },
+      { new: true }
+   );
+
+   if (!comment) {
+      throw new ApiError(400, "Comment not found");
+   }
+
+   res.status(200).json(new ApiResponse(200, comment, "Comment updated"));
+});
+
+export { addComment, updateComment };
