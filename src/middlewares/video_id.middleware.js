@@ -9,8 +9,10 @@ const getVideoId = asyncHandler(async (req, _, next) => {
       `Youtube/Videos/${cloudinaryPublicId}`,
       { resource_type: "video" }
    );
+
    const videoDocument = await Video.findOne({ videoFile: secure_url });
    req.videoId = videoDocument._id;
+   
    next();
 });
 
