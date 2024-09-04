@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import { Subscription } from "../models/subscription.model.js";
+import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -30,4 +32,44 @@ const toggleSubscription = asyncHandler(async (req, res) => {
    }
 });
 
-export { toggleSubscription };
+const getUserChannelSubscribers = asyncHandler(async (req, res) => {
+   const { channelId } = req.params;
+
+   const subscribers = await Subscription.aggregate([
+      {
+         $match: {
+            channel: new mongoose.Types.ObjectId(channelId),
+         },
+      },
+      {
+         $group: {
+            _id: null,
+            subscribers: { $push: "$$ROOT" },
+         },
+      },
+      {
+         $addFields: {
+            subscribersCount: { $size: "$subscribers" },
+         },
+      },
+      {
+         $project: { _id: 0 },
+      },
+   ]);
+
+   if (!subscribers.length) {
+      res.status(200).json(
+         new ApiResponse(
+            200,
+            { Subscribers: 0 },
+            "Channel have zero subscribers"
+         )
+      );
+   } else {
+      res.status(200).json(
+         new ApiResponse(200, subscribers, "Subscribers fetched successfully")
+      );
+   }
+});
+
+export { toggleSubscription, getUserChannelSubscribers };
