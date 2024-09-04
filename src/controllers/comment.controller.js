@@ -62,4 +62,31 @@ const updateComment = asyncHandler(async (req, res) => {
    res.status(200).json(new ApiResponse(200, comment, "Comment updated"));
 });
 
-export { addComment, updateComment };
+const deleteComment = asyncHandler(async (req, res) => {
+   const { content } = req.body;
+   const videoId = req.videoId,
+      owner = req.user._id;
+   if (
+      [content, videoId, owner].some((field) =>
+         ["", undefined, null].includes(field)
+      )
+   ) {
+      throw new ApiError(400, "All fields are required");
+   }
+
+   const result = await Comment.findOneAndDelete({
+      content,
+      video: videoId,
+      owner,
+   });
+
+   if (!result) {
+      throw new ApiError(400, "Comment not found");
+   }
+
+   res.status(200).json(
+      new ApiResponse(200, { Deleted: true }, "Comment deleted successfully")
+   );
+});
+
+export { addComment, updateComment, deleteComment };
