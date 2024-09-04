@@ -121,7 +121,7 @@
 
 -  It is mandtory to pass resource_type when deleting a file other than image from the cloudinary
 
--  Pagination is applied only on the aggregation pipeline not on the result document of the aggregation
+-  Pagination is applied only on the aggregation pipeline not on the result document of the aggregation so dont use 'await' before aggregation when using aggregatepaginate()
 
 ---
 
