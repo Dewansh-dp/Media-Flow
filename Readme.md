@@ -230,3 +230,18 @@ router.get("/download/:id", async (req, res) => {
       response.data.pipe(res);
       res.status(200);
       ```
+
+-  to get the meta data from the cloudinary
+   ```js
+   cloudinary.api.resource(
+      "FolderName/PublicId",
+      { resource_type: "video", media_metadata: true },
+      function (error, result) {
+         if (error) {
+            console.error("Error:", error);
+         } else {
+            console.log("Asset Info:", result);
+         }
+      }
+   );
+   ```
