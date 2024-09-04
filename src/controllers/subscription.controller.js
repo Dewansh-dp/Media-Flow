@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import { Subscription } from "../models/subscription.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -34,6 +34,10 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
    const { channelId } = req.params;
+
+   if(!mongoose.isValidObjectId(channelId)){
+    throw new ApiError(400,"Invalid ID input")
+   }
 
    const subscribers = await Subscription.aggregate([
       {
@@ -72,4 +76,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
    }
 });
 
-export { toggleSubscription, getUserChannelSubscribers };
+const getSubscribedChannels= asyncHandler(async (req, res)=>{
+
+})
+export { toggleSubscription, getUserChannelSubscribers ,getSubscribedChannels};
