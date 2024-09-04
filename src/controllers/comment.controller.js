@@ -1,7 +1,36 @@
+import mongoose from "mongoose";
 import { Comment } from "../models/comment.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+
+const getAllComments = asyncHandler(async (req, res) => {
+   // all comment on single video
+
+   const { page, limit } = req.query;
+   const { videoId } = req.params;
+
+   if (
+      [page, limit, videoId].some(
+         (field) => field === undefined || field === null
+      )
+   ) {
+      throw new ApiError(400, "All fields are required");
+   }
+
+   const pipeline = Comment.aggregate([
+      { $match: { video: new mongoose.Types.ObjectId(videoId) } },
+      {
+         $project: { content: 1, _id: 0 },
+      },
+   ]);
+
+   const comments = await Comment.aggregatePaginate(pipeline, { page, limit });
+
+   res.status(200).json(
+      new ApiResponse(200, comments.docs, "All comments fetched successfully")
+   );
+});
 
 const addComment = asyncHandler(async (req, res) => {
    const { content } = req.body;
@@ -89,4 +118,4 @@ const deleteComment = asyncHandler(async (req, res) => {
    );
 });
 
-export { addComment, updateComment, deleteComment };
+export { addComment, updateComment, deleteComment, getAllComments };
