@@ -35,4 +35,22 @@ const createPlaylist = asyncHandler(async (req, res) => {
    );
 });
 
-export { createPlaylist };
+const getUserPlaylists = asyncHandler(async (req, res) => {
+   const playlists = await Playlist.find({ owner: req.user._id });
+
+   if (!playlists) {
+      res.status(200).json(
+         new ApiResponse(200, { Playlists: 0 }, "You have 0 playlist")
+      );
+   } else {
+      res.status(200).json(
+         new ApiResponse(
+            200,
+            { playlists: playlists.length },
+            "All playlist fetched successfully"
+         )
+      );
+   }
+});
+
+export { createPlaylist, getUserPlaylists };
