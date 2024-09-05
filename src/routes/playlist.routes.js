@@ -1,10 +1,15 @@
 import { Router } from "express";
-import { createPlaylist } from "../controllers/playlist.controller.js";
+import {
+   createPlaylist,
+   getUserPlaylists,
+} from "../controllers/playlist.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
-const router= Router()
-router.use(verifyJWT)
+const router = Router();
+router.use(verifyJWT);
 
-router.route("/create-playlist").post(createPlaylist)
+router.route("/create-playlist").post(createPlaylist);
 
-export default router
+router.route("/get-all-playlists").get(getUserPlaylists);
+
+export default router;
