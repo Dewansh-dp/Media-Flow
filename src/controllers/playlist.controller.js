@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Playlist } from "../models/playlist.model.js";
+import mongoose from "mongoose";
 
 const createPlaylist = asyncHandler(async (req, res) => {
    const { name, description } = req.body;
@@ -74,4 +75,35 @@ const getPlaylistById = asyncHandler(async (req, res) => {
    );
 });
 
-export { createPlaylist, getUserPlaylists, getPlaylistById };
+const addVideoToPlaylist = asyncHandler(async (req, res) => {
+   const { playlistId, videoId } = req.params;
+
+   if (!playlistId || !videoId) {
+      throw new ApiError(400, "Playlist id and Video id are required");
+   }
+
+   const playlist = await Playlist.findById(playlistId);
+
+   if (!playlist) {
+      throw new ApiError(400, "Playlist do not exist, please check id");
+   }
+
+   if (playlist.videos.includes(videoId)) {
+      throw new ApiError(400, "Video is already added to the playlist");
+   }
+
+   playlist.videos.push(new mongoose.Types.ObjectId(videoId));
+
+   const updatedPlaylist = await playlist.save();
+
+   res.status(200).json(
+      new ApiResponse(200, updatedPlaylist.videos, "Video added to playlist")
+   );
+});
+
+export {
+   createPlaylist,
+   getUserPlaylists,
+   getPlaylistById,
+   addVideoToPlaylist,
+};
