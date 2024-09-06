@@ -101,9 +101,34 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
    );
 });
 
+const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
+   const { playlistId, videoId } = req.params;
+
+   if (!playlistId || !videoId) {
+      throw new ApiError(400, "Playlist id and video id are required");
+   }
+
+   const response = await Playlist.findByIdAndUpdate(
+      playlistId,
+      {
+         $pull: { videos: videoId },
+      },
+      { new: true }
+   );
+
+   if (!response) {
+      throw new ApiError(400, "Video not found, please check videoId");
+   }
+
+   res.status(200).json(
+      new ApiResponse(200, response.videos, "Playlist updated successfully")
+   );
+});
+
 export {
    createPlaylist,
    getUserPlaylists,
    getPlaylistById,
    addVideoToPlaylist,
+   removeVideoFromPlaylist,
 };
