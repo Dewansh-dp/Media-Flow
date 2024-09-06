@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
    addVideoToPlaylist,
    createPlaylist,
+   deletePlaylist,
    getPlaylistById,
    getUserPlaylists,
    removeVideoFromPlaylist,
@@ -20,5 +21,7 @@ router.route("/get-playlist/:playlistId").get(getPlaylistById);
 router.route("/add-video-to-playlist/:playlistId/:videoId").patch(addVideoToPlaylist);
 
 router.route("/remove-video-from-playlist/:playlistId/:videoId").patch(removeVideoFromPlaylist)
+
+router.route("/delete-playlist/:playlistId").delete(deletePlaylist)
 
 export default router;
