@@ -47,6 +47,8 @@
 12.   ### Model
       [Link for model](https://app.eraser.io/workspace/yxxMC8OYXuNwvVKaTuSt?origin=share)
 
+13.  ### Postman
+      [Link for postman](https://documenter.getpostman.com/view/37398924/2sAXjRUp89#intro)
 ---
 
 -  '.env' have a problem with 'type:module' so the solution for it is to add '-r dotenv/config' in 'dev' command in scripts in the package.json file
