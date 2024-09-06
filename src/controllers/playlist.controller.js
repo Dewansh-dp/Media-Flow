@@ -173,7 +173,6 @@ const updatePlaylist = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Playlist not found");
    }
 
-   console.log(updatedPlaylist);
    res.status(200).json(
       new ApiResponse(
          200,
