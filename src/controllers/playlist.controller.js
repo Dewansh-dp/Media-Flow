@@ -34,6 +34,8 @@ const createPlaylist = asyncHandler(async (req, res) => {
    res.status(200).json(
       new ApiResponse(200, playlist, "Playlist created successfully")
    );
+
+   console.log("Playlist created");
 });
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
@@ -52,6 +54,8 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
          )
       );
    }
+
+   console.log("Got playlists");
 });
 
 const getPlaylistById = asyncHandler(async (req, res) => {
@@ -73,6 +77,8 @@ const getPlaylistById = asyncHandler(async (req, res) => {
    res.status(200).json(
       new ApiResponse(200, palylist, "Playlist fetched successfully")
    );
+
+   console.log("Got playlist");
 });
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
@@ -99,6 +105,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
    res.status(200).json(
       new ApiResponse(200, updatedPlaylist.videos, "Video added to playlist")
    );
+   console.log("Video added to playlist");
 });
 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
@@ -126,6 +133,8 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
    res.status(200).json(
       new ApiResponse(200, response.videos, "Playlist updated successfully")
    );
+
+   console.log("Video removed from playlist");
 });
 
 const deletePlaylist = asyncHandler(async (req, res) => {
@@ -147,6 +156,8 @@ const deletePlaylist = asyncHandler(async (req, res) => {
          `Playlist ${response.name} deleted successfully`
       )
    );
+
+   console.log("Video deleted from playlist");
 });
 
 const updatePlaylist = asyncHandler(async (req, res) => {
@@ -183,6 +194,8 @@ const updatePlaylist = asyncHandler(async (req, res) => {
          "Playlist updated successfully"
       )
    );
+
+   console.log("Updated playlist");
 });
 
 export {
@@ -192,5 +205,5 @@ export {
    addVideoToPlaylist,
    removeVideoFromPlaylist,
    deletePlaylist,
-   updatePlaylist
+   updatePlaylist,
 };
