@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Playlist } from "../models/playlist.model.js";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const createPlaylist = asyncHandler(async (req, res) => {
    const { name, description } = req.body;
@@ -108,8 +108,11 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Playlist id and video id are required");
    }
 
-   const response = await Playlist.findByIdAndUpdate(
-      playlistId,
+   const response = await Playlist.findOneAndUpdate(
+      {
+         _id: new mongoose.Types.ObjectId(playlistId),
+         videos: { $in: [videoId] },
+      },
       {
          $pull: { videos: videoId },
       },
@@ -117,11 +120,32 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
    );
 
    if (!response) {
-      throw new ApiError(400, "Video not found, please check videoId");
+      throw new ApiError(400, "Playlist or video not found, please check Id");
    }
 
    res.status(200).json(
       new ApiResponse(200, response.videos, "Playlist updated successfully")
+   );
+});
+
+const deletePlaylist = asyncHandler(async (req, res) => {
+   const { playlistId } = req.params;
+
+   if (!playlistId) {
+      throw new ApiError(400, "Playlist id is missing");
+   }
+
+   const response = await Playlist.findByIdAndDelete(playlistId);
+   if (!response) {
+      throw new ApiError(400, "Playlist not found");
+   }
+
+   res.status(200).json(
+      new ApiResponse(
+         200,
+         { Deleted: response.name },
+         `Playlist ${response.name} deleted successfully`
+      )
    );
 });
 
@@ -131,4 +155,5 @@ export {
    getPlaylistById,
    addVideoToPlaylist,
    removeVideoFromPlaylist,
+   deletePlaylist,
 };
