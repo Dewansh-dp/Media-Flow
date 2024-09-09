@@ -18,7 +18,9 @@ const createTweet = asyncHandler(async (req, res) => {
 });
 
 const getUserTweets = asyncHandler(async (req, res) => {
-   const tweets = await Tweet.find({ owner: req.user._id }).select("owner content updatedAt")
+   const tweets = await Tweet.find({ owner: req.user._id }).select(
+      "owner content updatedAt"
+   );
    if (!tweets.length) {
       throw new ApiError(400, "No tweets found");
    }
@@ -28,4 +30,22 @@ const getUserTweets = asyncHandler(async (req, res) => {
    );
 });
 
-export { createTweet, getUserTweets };
+const updateTweet = asyncHandler(async (req, res) => {
+   const { content, oldContent } = req.body;
+   if (!content || !oldContent) {
+      throw new ApiError(400, "Content is missing");
+   }
+   const tweet = await Tweet.findOneAndUpdate(
+      { owner: req.user._id, content: oldContent },
+      {
+         content,
+      },
+      { new: true }
+   ).select("content updatedAt")
+   
+   res.status(200).json(
+      new ApiResponse(200, tweet, "Tweet updated successfully")
+   );
+});
+
+export { createTweet, getUserTweets, updateTweet };
