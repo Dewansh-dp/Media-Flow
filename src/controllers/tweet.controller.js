@@ -41,11 +41,27 @@ const updateTweet = asyncHandler(async (req, res) => {
          content,
       },
       { new: true }
-   ).select("content updatedAt")
-   
+   ).select("content updatedAt");
+
    res.status(200).json(
       new ApiResponse(200, tweet, "Tweet updated successfully")
    );
 });
 
-export { createTweet, getUserTweets, updateTweet };
+const deleteTweet = asyncHandler(async (req, res) => {
+   const { content } = req.body;
+   if (!content) {
+      throw new ApiError(400, "Content is missing");
+   }
+   const deletedTweet = await Tweet.findOneAndDelete({
+      owner: req.user._id,
+      content,
+   }).select("content");
+
+   console.log(deletedTweet);
+   res.status(200).json(
+      new ApiResponse(200, deletedTweet, "Tweet deleted successfully")
+   );
+});
+
+export { createTweet, getUserTweets, updateTweet, deleteTweet };
