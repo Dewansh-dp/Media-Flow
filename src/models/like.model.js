@@ -2,9 +2,8 @@ import mongoose, { Schema } from "mongoose";
 
 const likeSchema = new Schema(
    {
-      video: { type: mongoose.Types.ObjectId, ref: "Video" },
+      video: { type: mongoose.Types.ObjectId, ref: "Video", required: true },
       comment: { type: mongoose.Types.ObjectId, ref: "Comment" },
-      tweet: { type: mongoose.Types.ObjectId, ref: "Tweet" },
       likedBy: { type: mongoose.Types.ObjectId, ref: "User" },
    },
    { timestamps: true }
