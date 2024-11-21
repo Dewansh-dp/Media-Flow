@@ -366,7 +366,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
    const filename = urlArray.pop();
    const oldAvatarPublicId = filename.split(".")[0];
    // console.log("oldAvatarPublicId", oldAvatarPublicId);
-   await deleteFromCloudinary(oldAvatarPublicId);
+   await deleteFromCloudinary("Youtube/Users/" + oldAvatarPublicId, "image");
 
    // here we have used "file" instead of "files" because we are uploading a single file only
    const avatarLocalPath = req.file?.path;
@@ -403,7 +403,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
    const filename = urlArray.pop();
    const oldCoverImagePublicId = filename.split(".")[0];
    // console.log("oldCoverImagePublicId", oldCoverImagePublicId);
-   await deleteFromCloudinary(oldCoverImagePublicId);
+   await deleteFromCloudinary(
+      "Youtube/Users/" + oldCoverImagePublicId,
+      "image"
+   );
 
    // here we have used "file" instead of "files" because we are uploading a single file only
    const coverImageLocalPath = req.file?.path;
